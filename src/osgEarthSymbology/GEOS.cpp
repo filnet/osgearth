@@ -66,7 +66,7 @@ namespace
     }
 
     geom::Geometry*
-    import( const Symbology::Geometry* input, const geom::GeometryFactory* f )
+    import( const Symbology::Geometry* input, const geom::GeometryFactory::unique_ptr f )
     {
         geom::Geometry* output = 0L;
 
@@ -212,7 +212,7 @@ GEOSContext::GEOSContext()
     geos::geom::PrecisionModel* pm = new geos::geom::PrecisionModel(geom::PrecisionModel::FLOATING);
 
     // Factory will clone the PM
-    _factory = new geos::geom::GeometryFactory( pm );
+    _factory = geos::geom::GeometryFactory::create( pm );
 
     // Delete the template.
     delete pm;
@@ -220,7 +220,6 @@ GEOSContext::GEOSContext()
 
 GEOSContext::~GEOSContext()
 {
-    delete _factory;
 }
 
 geom::Geometry*
@@ -327,10 +326,7 @@ GEOSContext::disposeGeometry(geom::Geometry* input)
 {
     if (input)
     {
-        geom::GeometryFactory* f = const_cast<geom::GeometryFactory*>(input->getFactory());
         _factory->destroyGeometry(input);
-        if ( f != _factory )
-            delete f;
     }
 }
 
