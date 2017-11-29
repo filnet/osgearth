@@ -23,8 +23,8 @@
 #include <osgEarth/Registry>
 #include <osgEarth/Progress>
 #include <osgEarth/FileUtils>
+#include <osgEarth/Utils>
 #include <osgDB/FileNameUtils>
-#include <osgDB/ReadFile>
 #include <osgDB/ReaderWriter>
 #include <osgDB/Archive>
 #include <fstream>
@@ -346,7 +346,8 @@ namespace
             return r;
         }
         ReadResult fromFile( const std::string& uri, const osgDB::Options* opt ) { 
-            ReadResult r = ReadResult(osgDB::readImageFile(uri, opt));
+            // FIXME why the need for the osgEarth:: qualifier
+            ReadResult r = ReadResult(osgEarth::readImageFile(uri, opt));
             if ( r.getImage() ) r.getImage()->setFileName( uri );
             return r;
         }

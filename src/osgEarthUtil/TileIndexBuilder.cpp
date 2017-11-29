@@ -29,7 +29,6 @@
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
 
-using namespace osgDB;
 using namespace osgEarth;
 using namespace osgEarth::Util;
 using namespace osgEarth::Drivers;

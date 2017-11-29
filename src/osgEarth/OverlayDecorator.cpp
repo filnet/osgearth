@@ -23,6 +23,7 @@
 #include <osgEarth/DrapingTechnique>
 #include <osgEarth/MapInfo>
 #include <osgEarth/NodeUtils>
+#include <osgEarth/Utils>
 #include <osgEarth/Registry>
 #include <osgEarth/Capabilities>
 #include <osgEarth/CullingUtils>
@@ -722,17 +723,17 @@ OverlayDecorator::cullTerrainAndCalculateRTTParams(osgUtil::CullVisitor* cv,
             {
                 frustumPH.dumpGeometry(0,0,0,fn);
             }
-            osg::Node* camNode = osgDB::readNodeFile(fn);
+            osg::ref_ptr<osg::Node> camNode = readNodeFile(fn);
             camNode->setName("camera");
 
             // visible overlay BEFORE cutting:
             //uncutVisiblePH.dumpGeometry(0,0,0,fn,osg::Vec4(0,1,1,1),osg::Vec4(0,1,1,.25));
-            //osg::Node* overlay = osgDB::readNodeFile(fn);
+            //osg::ref_ptr<osg::Node> overlay = readNodeFile(fn);
             //overlay->setName("overlay");
 
             // visible overlay Polyherdron AFTER cuting:
             visiblePH.dumpGeometry(0,0,0,fn,osg::Vec4(1,.5,1,1),osg::Vec4(1,.5,0,.25));
-            osg::Node* intersection = osgDB::readNodeFile(fn);
+            osg::ref_ptr<osg::Node> intersection = readNodeFile(fn);
             intersection->setName("intersection");
 
             // RTT frustum:
@@ -745,7 +746,7 @@ OverlayDecorator::cullTerrainAndCalculateRTTParams(osgUtil::CullVisitor* cv,
                 rttPH.transform( inverseMVP, MVP );
                 rttPH.dumpGeometry(0,0,0,fn,osg::Vec4(1,1,0,1),osg::Vec4(1,1,0,0.25));
             }
-            osg::Node* rttNode = osgDB::readNodeFile(fn);
+            osg::ref_ptr<osg::Node> rttNode = readNodeFile(fn);
             rttNode->setName("rtt");
 
             // EyePoint
@@ -758,10 +759,10 @@ OverlayDecorator::cullTerrainAndCalculateRTTParams(osgUtil::CullVisitor* cv,
 
             osg::Group* g = new osg::Group();
             //g->getOrCreateStateSet()->setAttribute(new osg::Program(), 0);
-            g->addChild(camNode);
-            //g->addChild(overlay);
-            g->addChild(intersection);
-            g->addChild(rttNode);
+            g->addChild(camNode.release());
+            //g->addChild(overlay.release());
+            g->addChild(intersection.release());
+            g->addChild(rttNode.release());
             g->addChild(dsgmt);
 
             _dump = g;

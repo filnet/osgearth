@@ -24,12 +24,12 @@
 #include <osgEarth/FileUtils>
 #include <osgEarth/Registry>
 #include <osgEarth/ThreadingUtils>
+#include <osgEarth/Utils>
 #include <osgEarth/MemCache>
 #include <osgEarth/MapFrame>
 #include <osgEarth/Progress>
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
-#include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 
 #define LC "[TileSource] "
@@ -475,7 +475,7 @@ TileSource::getBlacklist() const
 TileSource*
 TileSourceFactory::create(const TileSourceOptions& options)
 {
-    TileSource* result = 0L;
+    osg::ref_ptr<TileSource> tileSource;
 
     std::string driver = options.getDriver();
     if ( driver.empty() )
@@ -489,15 +489,15 @@ TileSourceFactory::create(const TileSourceOptions& options)
     dbopt->setPluginStringData( TILESOURCE_INTERFACE_TAG, TileSource::INTERFACE_NAME );
 
     std::string driverExt = std::string( ".osgearth_" ) + driver;
-    result = dynamic_cast<TileSource*>( osgDB::readObjectFile( driverExt, dbopt.get() ) );
-    if ( !result )
+
+    tileSource = readFile<TileSource>( driverExt );
+    if ( !tileSource )
     {
         OE_INFO << LC << "Failed to load TileSource driver \"" << driver << "\"" << std::endl;
     }
-
     else
     {
-        OE_DEBUG << LC << "Tile source Profile = " << (result->getProfile() ? result->getProfile()->toString() : "NULL") << std::endl;
+        OE_DEBUG << LC << "Tile source Profile = " << (tileSource->getProfile() ? tileSource->getProfile()->toString() : "NULL") << std::endl;
 
         // apply an Override Profile if provided.
         if ( options.profile().isSet() )
@@ -505,12 +505,12 @@ TileSourceFactory::create(const TileSourceOptions& options)
             const Profile* profile = Profile::create(*options.profile());
             if ( profile )
             {
-                result->setProfile( profile );
+                tileSource->setProfile( profile );
             }
         }
     }
 
-    return result;
+    return tileSource.release();
 }
 
 

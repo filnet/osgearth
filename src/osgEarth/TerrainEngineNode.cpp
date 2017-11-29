@@ -25,7 +25,7 @@
 #include <osgEarth/MapModelChange>
 #include <osgEarth/TerrainTileModelFactory>
 #include <osgEarth/TraversalData>
-#include <osgDB/ReadFile>
+#include <osgEarth/Utils>
 #include <osg/CullFace>
 #include <osg/PolygonOffset>
 #include <osgViewer/View>
@@ -419,7 +419,7 @@ TerrainEngineNode::setComputeRangeCallback(ComputeRangeCallback* computeRangeCal
 TerrainEngineNode*
 TerrainEngineNodeFactory::create(const TerrainOptions& options )
 {
-    TerrainEngineNode* result = 0L;
+    osg::ref_ptr<TerrainEngineNode> terrainEngineNode;
 
     std::string driver =
         Registry::instance()->overrideTerrainEngineDriverName().getOrUse(options.getDriver());
@@ -428,12 +428,12 @@ TerrainEngineNodeFactory::create(const TerrainOptions& options )
         driver = Registry::instance()->getDefaultTerrainEngineDriverName();
 
     std::string driverExt = std::string( ".osgearth_engine_" ) + driver;
-    result = dynamic_cast<TerrainEngineNode*>( osgDB::readObjectFile( driverExt ) );
-    if ( !result )
+    terrainEngineNode = readFile<TerrainEngineNode>( driverExt );
+    if ( !terrainEngineNode )
     {
         OE_WARN << "WARNING: Failed to load terrain engine driver for \"" << driver << "\"" << std::endl;
     }
 
-    return result;
+    return terrainEngineNode.release();
 }
 

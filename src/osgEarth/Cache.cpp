@@ -19,11 +19,9 @@
 #include <osgEarth/Cache>
 #include <osgEarth/Registry>
 #include <osgEarth/ThreadingUtils>
+#include <osgEarth/Utils>
 
 #include <osg/UserDataContainer>
-#include <osgDB/FileNameUtils>
-#include <osgDB/FileUtils>
-#include <osgDB/ReadFile>
 #include <osgDB/Registry>
 #include <osgDB/ReaderWriter>
 
@@ -151,7 +149,7 @@ Cache::removeBin( CacheBin* bin )
 Cache*
 CacheFactory::create( const CacheOptions& options )
 {
-    osg::ref_ptr<Cache> result =0L;
+    osg::ref_ptr<Cache> cache;
     OE_DEBUG << LC << "Initializing cache of type \"" << options.getDriver() << "\"" << std::endl;
 
     if ( options.getDriver().empty() )
@@ -168,14 +166,14 @@ CacheFactory::create( const CacheOptions& options )
         rwopt->setPluginData( CACHE_OPTIONS_TAG, (void*)&options );
 
         std::string driverExt = std::string(".osgearth_cache_") + options.getDriver();
-        osgDB::ReaderWriter::ReadResult rr = osgDB::readObjectFile( driverExt, rwopt.get() );
-        result = dynamic_cast<Cache*>( rr.getObject() );
-        if ( !result.valid() )
+        // XXX why the need for osgEarth qualifier ?
+        cache = osgEarth::readFile<Cache>( driverExt, rwopt.get() );
+        if ( !cache.valid() )
         {
             OE_WARN << LC << "Failed to load cache plugin for type \"" << options.getDriver() << "\"" << std::endl;
         }
     }
-    return result.release();
+    return cache.release();
 }
 
 //------------------------------------------------------------------------

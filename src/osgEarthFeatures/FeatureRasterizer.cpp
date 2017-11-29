@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 #include <osgEarthFeatures/FeatureRasterizer>
-#include <osgDB/ReadFile>
+#include <osgEarth/Utils>
 
 using namespace osgEarth;
 using namespace osgEarth::Features;
@@ -40,17 +40,19 @@ FeatureRasterizerFactory::create(const std::string& driver,
 
     // Setup the plugin options for the source
     pluginOptions->config() = driverConf;
+    
+    std::string driverExt = std::string(".osgearth_rasterizer_") + driver;
 
-	//Load the source from the a plugin.  The "." prefix causes OSG to select the correct plugin.
-    //For instance, the WMS plugin can be loaded by using ".osgearth_wms" as the filename
-    osg::ref_ptr<FeatureRasterizer> rasterizer = dynamic_cast<FeatureRasterizer*>(
-        osgDB::readObjectFile( ".osgearth_rasterizer_" + driver, pluginOptions.get()));
+    // Load the source from the a plugin.  The "." prefix causes OSG to select the correct plugin.
+    // For instance, the WMS plugin can be loaded by using ".osgearth_wms" as the filename
+    osg::ref_ptr<FeatureRasterizer> rasterizer = dynamic_cast<osg::ref_ptr<FeatureRasterizer>>(
+        readObjectFile( driverExt, pluginOptions.get()));
 
-	if ( !rasterizer.valid() )
-	{
-		osg::notify(osg::NOTICE) << "[osgEarth] Warning: Could not load Rasterizer for driver "  << driver << std::endl;
-	}
+    if ( !rasterizer.valid() )
+    {
+        sg::notify(osg::NOTICE) << "[osgEarth] Warning: Could not load Rasterizer for driver "  << driver << std::endl;
+    }
 
-	return rasterizer.release();
+    return rasterizer.release();
 }
 

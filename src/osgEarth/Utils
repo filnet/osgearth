@@ -27,6 +27,7 @@
 
 #include <osg/Vec3f>
 #include <osg/AutoTransform>
+#include <osgDB/ReadFile>
 #include <osgGA/GUIEventHandler>
 #include <osgViewer/View>
 #include <osgUtil/CullVisitor>
@@ -252,6 +253,81 @@ namespace osgEarth
         virtual ~AllocateAndMergeBufferObjectsVisitor() { }
         void apply(osg::Geode& geode);
     };
+
+    inline osg::ref_ptr<osg::Node> readNodeFile(const std::string& filename, const osgDB::Options* options)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefNodeFile(filename, options);
+#else
+        return osgDB::readNodeFile(filename, options);
+#endif
+    }
+
+    inline osg::ref_ptr<osg::Node> readNodeFile(const std::string& filename)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefNodeFile(filename);
+#else
+        return osgDB::readNodeFile(filename);
+#endif
+    }
+
+    inline osg::ref_ptr<osg::Image> readImageFile(const std::string& filename, const osgDB::Options* options)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefImageFile(filename, options);
+#else
+        return osgDB::readImageFile(filename, options);
+#endif
+    }
+
+    inline osg::ref_ptr<osg::Image> readImageFile(const std::string& filename)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefImageFile(filename);
+#else
+        return osgDB::readImageFile(filename);
+#endif
+    }
+
+    inline osg::ref_ptr<osg::Object> readObjectFile(const std::string& filename, const osgDB::Options* options)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefObjectFile(filename, options);
+#else
+        return osgDB::readObjectFile(filename, options);
+#endif
+    }
+
+    inline osg::ref_ptr<osg::Object> readObjectFile(const std::string& filename)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefObjectFile(filename);
+#else
+        return osgDB::readObjectFile(filename);
+#endif
+    }
+
+    template<typename T>
+    inline osg::ref_ptr<T> readFile(const std::string& filename, const osgDB::Options* options)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefFile<T>(filename, options);
+#else
+        return osgDB::readFile<T>(filename, options);
+#endif
+    }
+
+    template<typename T>
+    inline osg::ref_ptr<T> readFile(const std::string& filename)
+    {
+#if OSG_VERSION_GREATER_THAN(3,5,0)
+        return osgDB::readRefFile<T>(filename);
+#else
+        return osgDB::readFile<T>(filename);
+#endif
+    }
+
 }
 
 #endif // OSGEARTH_UTILS_H

@@ -22,8 +22,8 @@
 #include <osgEarthFeatures/ConvertTypeFilter>
 #include <osgEarthFeatures/FilterContext>
 #include <osgEarth/Registry>
+#include <osgEarth/Utils>
 #include <osg/Notify>
-#include <osgDB/ReadFile>
 #include <OpenThreads/ScopedLock>
 
 #define LC "[FeatureSource] "
@@ -214,7 +214,7 @@ FeatureSource::applyFilters(FeatureList& features, const GeoExtent& extent) cons
 FeatureSource*
 FeatureSourceFactory::create( const FeatureSourceOptions& options )
 {
-    FeatureSource* featureSource = 0L;
+    osg::ref_ptr<FeatureSource> featureSource;
 
     if ( !options.getDriver().empty() )
     {
@@ -223,7 +223,7 @@ FeatureSourceFactory::create( const FeatureSourceOptions& options )
         osg::ref_ptr<osgDB::Options> rwopts = Registry::instance()->cloneOrCreateOptions();
         rwopts->setPluginData( FEATURE_SOURCE_OPTIONS_TAG, (void*)&options );
 
-        featureSource = dynamic_cast<FeatureSource*>( osgDB::readObjectFile( driverExt, rwopts.get() ) );
+        featureSource = dynamic_cast<osg::ref_ptr<FeatureSource>>( readObjectFile( driverExt, rwopts.get() ) );
         if ( featureSource )
         {
             if ( options.name().isSet() )
@@ -241,7 +241,7 @@ FeatureSourceFactory::create( const FeatureSourceOptions& options )
         OE_WARN << LC << "ILLEGAL null feature driver name" << std::endl;
     }
 
-    return featureSource;
+    return featureSource.release();
 }
 
 //------------------------------------------------------------------------
